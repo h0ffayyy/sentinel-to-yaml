@@ -1,6 +1,8 @@
+import argparse
+import pathlib
 import json
 import yaml
-import os
+import sys
 import re
 
 
@@ -53,20 +55,20 @@ class SentinelRule():
                 rule_template_version = '1.0.0'
                                 
             parsed_rule = {'id': f'{rule_guid}',
-                                'name': f'{rule_name}', 
-                                'description': f'{rule_description}',
-                                'severity': f'{rule_severity}', 
-                                'queryFrequency': f'{rule_query_frequency}',
-                                'queryPeriod': f'{rule_query_period}',
-                                'triggerOperator': f'{rule_trigger_operator}',
-                                'triggerThreshold': rule_trigger_threshold,
-                                'tactics': rule_tactics,
-                                'relevantTechniques': rule_techniques,
-                                'query': f"{rule_query}",
-                                'entityMappings': rule_entity_mappings,
-                                'version': rule_template_version,
-                                'kind': f'{rule_kind}'
-                                }
+                            'name': f'{rule_name}', 
+                            'description': f'{rule_description}',
+                            'severity': f'{rule_severity}', 
+                            'queryFrequency': f'{rule_query_frequency}',
+                            'queryPeriod': f'{rule_query_period}',
+                            'triggerOperator': f'{rule_trigger_operator}',
+                            'triggerThreshold': rule_trigger_threshold,
+                            'tactics': rule_tactics,
+                            'relevantTechniques': rule_techniques,
+                            'query': f"{rule_query}",
+                            'entityMappings': rule_entity_mappings,
+                            'version': rule_template_version,
+                            'kind': f'{rule_kind}'
+                        }
             self.parsed_rules.append(parsed_rule)
 
 
@@ -83,18 +85,44 @@ def create_yaml(rules):
             data = yaml.dump(rule, target_file, sort_keys=False)
 
 
+def parse_arguments():
+
+    parser = argparse.ArgumentParser(prog='sentinel_to_yaml.py', 
+                                    description='Convert exported Microsoft Sentinel rules to YAML')
+    parser.add_argument('-f', '--file', type=argparse.FileType('r'), 
+                        help='the source file to convert to YAML')
+    parser.add_argument('-d', '--directory', type=pathlib.Path, 
+                        help='a source directory containing Sentinel rule files to convert to YAML')
+    args = parser.parse_args()
+
+    if args.file is None and args.directory is None:
+        print('[!] Please provide a source to convert to YAML')
+        sys.exit(1)
+    else:
+        return args
+
+
 def main():
-    rules_source = open("./hafnium.json", "r")
-    #rules_source = open("./linux-failed-logins.json", "r")
-    #rules_source = open("./privileged_role.json", "r")
 
-    SR = SentinelRule(rules_source)
-    SR.parse_sentinel_rule()
+    args = parse_arguments()
 
-    create_yaml(SR)
+    if args.file is not None:
+        SR = SentinelRule(args.file)
+        SR.parse_sentinel_rule()
+        create_yaml(SR)
+    
+    if args.directory is not None:
+        for file in args.directory.glob('*.json'):
+            SR = SentinelRule(file.open())
+            SR.parse_sentinel_rule()
+            create_yaml(SR)
 
 
 if __name__ == "__main__":
     yaml.add_representer(str, str_presenter)
     yaml.representer.SafeRepresenter.add_representer(str, str_presenter)
-    main()
+
+    try:
+        main()
+    except KeyboardInterrupt:
+        print('Execution interrupted!')
