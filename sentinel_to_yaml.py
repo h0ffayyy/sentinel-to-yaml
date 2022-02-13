@@ -78,10 +78,22 @@ def str_presenter(dumper, data):
     return dumper.represent_scalar('tag:yaml.org,2002:str', data)
 
 
-def create_yaml(rules):
+def create_yaml(rules, args):
+    default_output_dir = pathlib.Path("./output")
+
+    if args.output is None and default_output_dir.is_dir() is False:
+        default_output_dir.mkdir(exist_ok=True)
+        output_dir = default_output_dir
+
+    if args.output is not None:
+        output_dir = args.output
+
+        if args.output.is_dir() is False:
+            args.output.mkdir(exist_ok=True)
+
     for rule in rules.parsed_rules:
         filename = re.sub("[^0-9a-zA-Z]+", "", rule['name'])
-        with open(f"output/{filename}.yml", "w") as target_file:
+        with open(f"{output_dir}/{filename}.yml", "w") as target_file:
             data = yaml.dump(rule, target_file, sort_keys=False)
 
 
@@ -93,6 +105,8 @@ def parse_arguments():
                         help='the source file to convert to YAML')
     parser.add_argument('-d', '--directory', type=pathlib.Path, 
                         help='a source directory containing Sentinel rule files to convert to YAML')
+    parser.add_argument('-o', '--output', type=pathlib.Path,
+                        help='specify a custom output directory')
     args = parser.parse_args()
 
     if args.file is None and args.directory is None:
@@ -109,13 +123,13 @@ def main():
     if args.file is not None:
         SR = SentinelRule(args.file)
         SR.parse_sentinel_rule()
-        create_yaml(SR)
+        create_yaml(SR, args)
     
     if args.directory is not None:
         for file in args.directory.glob('*.json'):
             SR = SentinelRule(file.open())
             SR.parse_sentinel_rule()
-            create_yaml(SR)
+            create_yaml(SR, args)
 
 
 if __name__ == "__main__":
