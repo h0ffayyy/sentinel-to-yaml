@@ -99,7 +99,7 @@ def create_yaml(rules, args):
 
 def parse_arguments():
 
-    parser = argparse.ArgumentParser(prog='sentinel_to_yaml.py', 
+    parser = argparse.ArgumentParser(prog='s2y.py', 
                                     description='Convert exported Microsoft Sentinel rules to YAML')
     parser.add_argument('-f', '--file', type=argparse.FileType('r'), 
                         help='the source file to convert to YAML')

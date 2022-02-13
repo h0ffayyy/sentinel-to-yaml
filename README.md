@@ -11,7 +11,7 @@ Only additional library requirement is PyYAML
 
 # How to use
 ```
-usage: sentinel_to_yaml.py [-h] [-f FILE] [-d DIRECTORY] [-o OUTPUT]
+usage: s2y.py [-h] [-f FILE] [-d DIRECTORY] [-o OUTPUT]
 
 Convert exported Microsoft Sentinel rules to YAML
 
@@ -27,15 +27,15 @@ optional arguments:
 
 ## Convert a single file
 
-`python sentinel_to_yaml.py -f ./hafnium.json`
+`python s2y.py -f ./hafnium.json`
 
-`python sentinel_to_yaml.py --file ./hafnium.json`
+`python s2y.py --file ./hafnium.json`
 
 ## Convert a directory of files
 
-`python sentinel_to_yaml.py -d /home/h0ffayyy/sentinel-rules/input/`
+`python s2y.py -d /home/h0ffayyy/sentinel-rules/input/`
 
-`python sentinel_to_yaml.py --directory /home/h0ffayyy/sentinel-rules/input/`
+`python s2y.py --directory /home/h0ffayyy/sentinel-rules/input/`
 ## Send converted files to a custom directory
 
-`python sentinel_to_yaml.py --directory /home/h0ffayyy/sentinel-rules/input/ -o converted_rules`
+`python s2y.py --directory /home/h0ffayyy/sentinel-rules/input/ -o converted_rules`
