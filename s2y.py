@@ -20,7 +20,7 @@ class SentinelRule():
             rule_name = rule['properties']['displayName']
             rule_description = rule['properties']['description']
             rule_severity = rule['properties']['severity']
-            rule_query = rule['properties']['query']
+            rule_query = rule['properties']['query'].replace("\r\n", "\n").replace("     \n", "\n").replace(" \n", "\n")
             rule_query_frequency = rule['properties']['queryFrequency'].replace("P", "").replace("T", "").lower()
             rule_query_period = rule['properties']['queryPeriod'].replace("P", "").replace("T", "").lower()
             rule_guid = rule['name'].split('SecurityInsights/')[1].split("\')]")[0] 
@@ -36,6 +36,8 @@ class SentinelRule():
             if len(rule['properties']['techniques']) > 0:
                 for technique in rule['properties']['techniques']:
                     rule_techniques.append(technique)
+
+            rule_required_connectors = []
 
             rule_trigger_operator = rule['properties']['triggerOperator']
             if rule_trigger_operator == "GreaterThan":
@@ -58,6 +60,7 @@ class SentinelRule():
                             'name': f'{rule_name}', 
                             'description': f'{rule_description}',
                             'severity': f'{rule_severity}', 
+                            'requiredDataConnectors': rule_required_connectors,
                             'queryFrequency': f'{rule_query_frequency}',
                             'queryPeriod': f'{rule_query_period}',
                             'triggerOperator': f'{rule_trigger_operator}',
@@ -80,6 +83,7 @@ def str_presenter(dumper, data):
 
 def create_yaml(rules, args):
     default_output_dir = pathlib.Path("./output")
+    output_dir = default_output_dir
 
     if args.output is None and default_output_dir.is_dir() is False:
         default_output_dir.mkdir(exist_ok=True)
