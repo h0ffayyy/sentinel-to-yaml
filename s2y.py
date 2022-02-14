@@ -20,7 +20,7 @@ class SentinelRule():
             rule_name = rule['properties']['displayName']
             rule_description = rule['properties']['description']
             rule_severity = rule['properties']['severity']
-            rule_query = rule['properties']['query'].replace("\r\n", "\n").replace("     \n", "\n").replace(" \n", "\n")
+            rule_query = re.sub(r"[\r\t\s]+\n", "\n", rule['properties']['query'])
             rule_query_frequency = rule['properties']['queryFrequency'].replace("P", "").replace("T", "").lower()
             rule_query_period = rule['properties']['queryPeriod'].replace("P", "").replace("T", "").lower()
             rule_guid = rule['name'].split('SecurityInsights/')[1].split("\')]")[0] 

@@ -57,4 +57,4 @@ optional arguments:
 # Known Issues
 
 - The `requiredDataConnector` field is set to an open brace by default
-- Query output may get messed up if there is any weird whitespace
+- Query output may get messed up if there is any weird whitespace, or if there is a regular expression within the query itself matching what I've used to catch whitespace issues
