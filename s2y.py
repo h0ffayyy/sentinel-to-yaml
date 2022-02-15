@@ -41,14 +41,6 @@ class SentinelRule():
 
                 rule_required_connectors = []
 
-                rule_trigger_operator = rule['properties']['triggerOperator']
-                if rule_trigger_operator == "GreaterThan":
-                    rule_trigger_operator = "gt"
-                elif rule_trigger_operator == "LessThan":
-                    rule_trigger_operator == "lt"
-                elif rule_trigger_operator == "Equal":
-                    rule_trigger_operator == "eq"
-
                 rule_entity_mappings = []
                 for entity in rule['properties']['entityMappings']:
                     rule_entity_mappings.append(entity)
@@ -65,7 +57,7 @@ class SentinelRule():
                                 'requiredDataConnectors': rule_required_connectors,
                                 'queryFrequency': f'{rule_query_frequency}',
                                 'queryPeriod': f'{rule_query_period}',
-                                'triggerOperator': f'{rule_trigger_operator}',
+                                'triggerOperator': f'{parse_trigger_operator(rule['triggerOperator'])}',
                                 'triggerThreshold': rule_trigger_threshold,
                                 'tactics': rule_tactics,
                                 'relevantTechniques': rule_techniques,
@@ -99,14 +91,6 @@ class SentinelRule():
                 # az cli doesn't currently output connectors
                 rule_required_connectors = []
 
-                rule_trigger_operator = rule['triggerOperator']
-                if rule_trigger_operator == "GreaterThan":
-                    rule_trigger_operator = "gt"
-                elif rule_trigger_operator == "LessThan":
-                    rule_trigger_operator == "lt"
-                elif rule_trigger_operator == "Equal":
-                    rule_trigger_operator == "eq"
-
                 # az cli doesn't currently output entity mappings
                 rule_entity_mappings = []
 
@@ -120,7 +104,7 @@ class SentinelRule():
                                 'requiredDataConnectors': rule_required_connectors,
                                 'queryFrequency': f'{rule_query_frequency}',
                                 'queryPeriod': f'{rule_query_period}',
-                                'triggerOperator': f'{rule_trigger_operator}',
+                                'triggerOperator': f'{parse_trigger_operator(rule['triggerOperator'])}',
                                 'triggerThreshold': rule_trigger_threshold,
                                 'tactics': rule_tactics,
                                 'relevantTechniques': rule_techniques,
@@ -131,6 +115,17 @@ class SentinelRule():
                             }
 
                 self.parsed_rules.append(parsed_rule)
+
+
+    def parse_trigger_operator(self, operator);
+        if operator == "GreaterThan":
+            rule_trigger_operator = "gt"
+        elif operator == "LessThan":
+            rule_trigger_operator == "lt"
+        elif operator == "Equal":
+            rule_trigger_operator == "eq"
+
+        return rule_trigger_operator
 
 
     def parse_cli_time(self, timevalue):
