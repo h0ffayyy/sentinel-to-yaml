@@ -1,6 +1,6 @@
 # sentinel-to-yaml
 
-A simple script that converts exported Microsoft Sentinel analytics rules ARM template files to YAML format following the Microsoft Sentinel content [query style guide](https://github.com/Azure/Azure-Sentinel/wiki/Query-Style-Guide)
+A simple script that converts exported Microsoft Sentinel analytics rules to YAML format following the Microsoft Sentinel content [query style guide](https://github.com/Azure/Azure-Sentinel/wiki/Query-Style-Guide)
 
 
 # Requirements
@@ -11,7 +11,16 @@ Only additional library requirement is PyYAML
 
 ## Export analytics rules
 
-This currently only works with the ARM templates exported from the web interface
+You can either manually export the rule ARM templates from the web interface, or use az cli to export the rules to JSON format.
+
+When exporting with Azure CLI, use the following query to pull only your scheduled rules:
+
+```
+az sentinel alert-rule list --resource-group "groupname" --workspace-name "workspacename" --query "[?kind=='Scheduled']"
+```
+
+If you don't have the `az sentinel` extension enabled, enable with:
+`az extension add --name sentinel`
 
 ## Running the script
 
@@ -57,4 +66,4 @@ optional arguments:
 # Known Issues
 
 - The `requiredDataConnector` field is set to an open brace by default
-- Query output may get messed up if there is any weird whitespace, or if there is a regular expression within the query itself matching what I've used to catch whitespace issues
+- Query output may not format properly if there is any weird whitespace, or if there is a regular expression within the query itself matching what I've used to catch whitespace issues

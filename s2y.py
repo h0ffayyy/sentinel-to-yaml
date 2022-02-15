@@ -16,63 +16,136 @@ class SentinelRule():
     def parse_sentinel_rule(self):
         json_data = json.load(self.rules_source)
         
-        for rule in json_data['resources']:
-            rule_name = rule['properties']['displayName']
-            rule_description = rule['properties']['description']
-            rule_severity = rule['properties']['severity']
-            rule_query = re.sub(r"[\r\t\s]+\n", "\n", rule['properties']['query'])
-            rule_query_frequency = rule['properties']['queryFrequency'].replace("P", "").replace("T", "").lower()
-            rule_query_period = rule['properties']['queryPeriod'].replace("P", "").replace("T", "").lower()
-            rule_guid = rule['name'].split('SecurityInsights/')[1].split("\')]")[0] 
-            rule_trigger_threshold = rule['properties']['triggerThreshold']
-            rule_kind = rule['kind']
-            rule_tactics = []
+        # handle ARM template rules
+        if "$schema" in json_data:
+            for rule in json_data['resources']:
+                rule_name = rule['properties']['displayName']
+                rule_description = rule['properties']['description']
+                rule_severity = rule['properties']['severity']
+                rule_query = re.sub(r"[\r\t\s]+\n", "\n", rule['properties']['query'])
+                rule_query_frequency = rule['properties']['queryFrequency'].replace("P", "").replace("T", "").lower()
+                rule_query_period = rule['properties']['queryPeriod'].replace("P", "").replace("T", "").lower()
+                rule_guid = rule['name'].split('SecurityInsights/')[1].split("\')]")[0] 
+                rule_trigger_threshold = rule['properties']['triggerThreshold']
+                rule_kind = rule['kind']
+                rule_tactics = []
 
-            if len(rule['properties']['tactics']) > 0:
-                for tactic in rule['properties']['tactics']:
-                    rule_tactics.append(tactic)
+                if len(rule['properties']['tactics']) > 0:
+                    for tactic in rule['properties']['tactics']:
+                        rule_tactics.append(tactic)
 
-            rule_techniques = []
-            if len(rule['properties']['techniques']) > 0:
-                for technique in rule['properties']['techniques']:
-                    rule_techniques.append(technique)
+                rule_techniques = []
+                if len(rule['properties']['techniques']) > 0:
+                    for technique in rule['properties']['techniques']:
+                        rule_techniques.append(technique)
 
-            rule_required_connectors = []
+                rule_required_connectors = []
 
-            rule_trigger_operator = rule['properties']['triggerOperator']
-            if rule_trigger_operator == "GreaterThan":
-                rule_trigger_operator = "gt"
-            elif rule_trigger_operator == "LessThan":
-                rule_trigger_operator == "lt"
-            elif rule_trigger_operator == "Equal":
-                rule_trigger_operator == "eq"
+                rule_trigger_operator = rule['properties']['triggerOperator']
+                if rule_trigger_operator == "GreaterThan":
+                    rule_trigger_operator = "gt"
+                elif rule_trigger_operator == "LessThan":
+                    rule_trigger_operator == "lt"
+                elif rule_trigger_operator == "Equal":
+                    rule_trigger_operator == "eq"
 
-            rule_entity_mappings = []
-            for entity in rule['properties']['entityMappings']:
-                rule_entity_mappings.append(entity)
+                rule_entity_mappings = []
+                for entity in rule['properties']['entityMappings']:
+                    rule_entity_mappings.append(entity)
 
-            if 'templateVersion' in rule['properties']:
-                rule_template_version = rule['properties']['templateVersion']
-            else:
+                if 'templateVersion' in rule['properties']:
+                    rule_template_version = rule['properties']['templateVersion']
+                else:
+                    rule_template_version = '1.0.0'
+
+                parsed_rule = {'id': f'{rule_guid}',
+                                'name': f'{rule_name}', 
+                                'description': f'{rule_description}',
+                                'severity': f'{rule_severity}', 
+                                'requiredDataConnectors': rule_required_connectors,
+                                'queryFrequency': f'{rule_query_frequency}',
+                                'queryPeriod': f'{rule_query_period}',
+                                'triggerOperator': f'{rule_trigger_operator}',
+                                'triggerThreshold': rule_trigger_threshold,
+                                'tactics': rule_tactics,
+                                'relevantTechniques': rule_techniques,
+                                'query': f"{rule_query}",
+                                'entityMappings': rule_entity_mappings,
+                                'version': rule_template_version,
+                                'kind': f'{rule_kind}'
+                            }
+                self.parsed_rules.append(parsed_rule)
+        # handle az cli exported rules
+        else:
+            for rule in json_data:
+                rule_name = rule['displayName']
+                rule_description = rule['description']
+                rule_severity = rule['severity']
+                rule_query = re.sub(r"[\r\t\s]+\n", "\n", rule['query'])
+                rule_guid = rule['name']
+                rule_trigger_threshold = rule['triggerThreshold']
+                rule_kind = rule['kind']
+                rule_tactics = []
+
+                if len(rule['tactics']) > 0:
+                    for tactic in rule['tactics']:
+                        rule_tactics.append(tactic)
+
+                rule_query_period = self.parse_cli_time(rule['queryPeriod'])
+                rule_query_frequency = self.parse_cli_time(rule['queryFrequency'])
+
+                # az cli doesn't currently output techniques
+                rule_techniques = []
+                # az cli doesn't currently output connectors
+                rule_required_connectors = []
+
+                rule_trigger_operator = rule['triggerOperator']
+                if rule_trigger_operator == "GreaterThan":
+                    rule_trigger_operator = "gt"
+                elif rule_trigger_operator == "LessThan":
+                    rule_trigger_operator == "lt"
+                elif rule_trigger_operator == "Equal":
+                    rule_trigger_operator == "eq"
+
+                # az cli doesn't currently output entity mappings
+                rule_entity_mappings = []
+
+                # az cli doesn't currently output template versions
                 rule_template_version = '1.0.0'
-                                
-            parsed_rule = {'id': f'{rule_guid}',
-                            'name': f'{rule_name}', 
-                            'description': f'{rule_description}',
-                            'severity': f'{rule_severity}', 
-                            'requiredDataConnectors': rule_required_connectors,
-                            'queryFrequency': f'{rule_query_frequency}',
-                            'queryPeriod': f'{rule_query_period}',
-                            'triggerOperator': f'{rule_trigger_operator}',
-                            'triggerThreshold': rule_trigger_threshold,
-                            'tactics': rule_tactics,
-                            'relevantTechniques': rule_techniques,
-                            'query': f"{rule_query}",
-                            'entityMappings': rule_entity_mappings,
-                            'version': rule_template_version,
-                            'kind': f'{rule_kind}'
-                        }
-            self.parsed_rules.append(parsed_rule)
+
+                parsed_rule = {'id': f'{rule_guid}',
+                                'name': f'{rule_name}', 
+                                'description': f'{rule_description}',
+                                'severity': f'{rule_severity}', 
+                                'requiredDataConnectors': rule_required_connectors,
+                                'queryFrequency': f'{rule_query_frequency}',
+                                'queryPeriod': f'{rule_query_period}',
+                                'triggerOperator': f'{rule_trigger_operator}',
+                                'triggerThreshold': rule_trigger_threshold,
+                                'tactics': rule_tactics,
+                                'relevantTechniques': rule_techniques,
+                                'query': f"{rule_query}",
+                                'entityMappings': rule_entity_mappings,
+                                'version': rule_template_version,
+                                'kind': f'{rule_kind}'
+                            }
+
+                self.parsed_rules.append(parsed_rule)
+
+
+    def parse_cli_time(self, timevalue):
+        if "day" in timevalue:
+            formatted_time_value = timevalue.split(" day")[0] + "d"
+        else:
+            rule_hours = timevalue.split(":")[0]
+            rule_minutes = timevalue.split(":")[1]
+
+            if rule_hours != "0":
+                formatted_time_value = rule_hours + "h"
+            else:
+                formatted_time_value = rule_minutes + "m"
+
+        return formatted_time_value
 
 
 def str_presenter(dumper, data):
@@ -102,7 +175,6 @@ def create_yaml(rules, args):
 
 
 def parse_arguments():
-
     parser = argparse.ArgumentParser(prog='s2y.py', 
                                     description='Convert exported Microsoft Sentinel rules to YAML')
     parser.add_argument('-f', '--file', type=argparse.FileType('r'), 
