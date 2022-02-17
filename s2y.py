@@ -50,22 +50,23 @@ class SentinelRule():
                 else:
                     rule_template_version = '1.0.0'
 
-                parsed_rule = {'id': f'{rule_guid}',
-                                'name': f'{rule_name}', 
-                                'description': f'{rule_description}',
-                                'severity': f'{rule_severity}', 
-                                'requiredDataConnectors': rule_required_connectors,
-                                'queryFrequency': f'{rule_query_frequency}',
-                                'queryPeriod': f'{rule_query_period}',
-                                'triggerOperator': f'{parse_trigger_operator(rule['triggerOperator'])}',
-                                'triggerThreshold': rule_trigger_threshold,
-                                'tactics': rule_tactics,
-                                'relevantTechniques': rule_techniques,
-                                'query': f"{rule_query}",
-                                'entityMappings': rule_entity_mappings,
-                                'version': rule_template_version,
-                                'kind': f'{rule_kind}'
-                            }
+                parsed_rule = {
+                    'id': f'{rule_guid}',
+                    'name': f'{rule_name}', 
+                    'description': f'{rule_description}',
+                    'severity': f'{rule_severity}', 
+                    'requiredDataConnectors': rule_required_connectors,
+                    'queryFrequency': f'{rule_query_frequency}',
+                    'queryPeriod': f'{rule_query_period}',
+                    'triggerOperator': f'{parse_trigger_operator(rule['triggerOperator'])}',
+                    'triggerThreshold': rule_trigger_threshold,
+                    'tactics': rule_tactics,
+                    'relevantTechniques': rule_techniques,
+                    'query': f"{rule_query}",
+                    'entityMappings': rule_entity_mappings,
+                    'version': rule_template_version,
+                    'kind': f'{rule_kind}'
+                }
                 self.parsed_rules.append(parsed_rule)
         # handle az cli exported rules
         else:
@@ -97,22 +98,23 @@ class SentinelRule():
                 # az cli doesn't currently output template versions
                 rule_template_version = '1.0.0'
 
-                parsed_rule = {'id': f'{rule_guid}',
-                                'name': f'{rule_name}', 
-                                'description': f'{rule_description}',
-                                'severity': f'{rule_severity}', 
-                                'requiredDataConnectors': rule_required_connectors,
-                                'queryFrequency': f'{rule_query_frequency}',
-                                'queryPeriod': f'{rule_query_period}',
-                                'triggerOperator': f'{parse_trigger_operator(rule['triggerOperator'])}',
-                                'triggerThreshold': rule_trigger_threshold,
-                                'tactics': rule_tactics,
-                                'relevantTechniques': rule_techniques,
-                                'query': f"{rule_query}",
-                                'entityMappings': rule_entity_mappings,
-                                'version': rule_template_version,
-                                'kind': f'{rule_kind}'
-                            }
+                parsed_rule = {
+                    'id': f'{rule_guid}',
+                    'name': f'{rule_name}', 
+                    'description': f'{rule_description}',
+                    'severity': f'{rule_severity}', 
+                    'requiredDataConnectors': rule_required_connectors,
+                    'queryFrequency': f'{rule_query_frequency}',
+                    'queryPeriod': f'{rule_query_period}',
+                    'triggerOperator': f'{parse_trigger_operator(rule['triggerOperator'])}',
+                    'triggerThreshold': rule_trigger_threshold,
+                    'tactics': rule_tactics,
+                    'relevantTechniques': rule_techniques,
+                    'query': f"{rule_query}",
+                    'entityMappings': rule_entity_mappings,
+                    'version': rule_template_version,
+                    'kind': f'{rule_kind}'
+                }
 
                 self.parsed_rules.append(parsed_rule)
 
