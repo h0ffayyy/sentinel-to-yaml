@@ -52,8 +52,9 @@ class SentinelRule():
                 rule_required_connectors = []
 
                 rule_entity_mappings = []
-                for entity in rule['properties']['entityMappings']:
-                    rule_entity_mappings.append(entity)
+                if 'entityMappings' in rule['properties'] and rule['properties']['entityMappings'] is not None:
+                    for entity in rule['properties']['entityMappings']:
+                        rule_entity_mappings.append(entity)
 
                 if 'templateVersion' in rule['properties']:
                     rule_template_version = rule['properties']['templateVersion']
