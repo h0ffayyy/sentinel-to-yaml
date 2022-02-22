@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import argparse
 import pathlib
 import json
@@ -19,6 +21,9 @@ class SentinelRule():
         # handle ARM template rules
         if "$schema" in json_data:
             for rule in json_data['resources']:
+                if 'displayName' not in rule['properties']:
+                    continue
+
                 rule_name = rule['properties']['displayName']
                 rule_description = rule['properties']['description']
                 rule_severity = rule['properties']['severity']
@@ -29,6 +34,11 @@ class SentinelRule():
                 rule_trigger_threshold = rule['properties']['triggerThreshold']
                 rule_kind = rule['kind']
                 rule_tactics = []
+
+                if 'triggerOperator' in rule['properties']:
+                    trigger_operator = self.parse_trigger_operator(rule['properties']['triggerOperator'])
+                else:
+                    trigger_operator = ""
 
                 if len(rule['properties']['tactics']) > 0:
                     for tactic in rule['properties']['tactics']:
@@ -58,7 +68,7 @@ class SentinelRule():
                     'requiredDataConnectors': rule_required_connectors,
                     'queryFrequency': f'{rule_query_frequency}',
                     'queryPeriod': f'{rule_query_period}',
-                    'triggerOperator': f'{parse_trigger_operator(rule['triggerOperator'])}',
+                    'triggerOperator': f'{trigger_operator}',
                     'triggerThreshold': rule_trigger_threshold,
                     'tactics': rule_tactics,
                     'relevantTechniques': rule_techniques,
@@ -71,6 +81,9 @@ class SentinelRule():
         # handle az cli exported rules
         else:
             for rule in json_data:
+                if 'displayname' not in rule:
+                    continue
+
                 rule_name = rule['displayName']
                 rule_description = rule['description']
                 rule_severity = rule['severity']
@@ -79,6 +92,11 @@ class SentinelRule():
                 rule_trigger_threshold = rule['triggerThreshold']
                 rule_kind = rule['kind']
                 rule_tactics = []
+
+                if 'triggerOperator' in rule:
+                    trigger_operator = self.parse_trigger_operator(rule['triggerOperator'])
+                else:
+                    trigger_operator = ""
 
                 if len(rule['tactics']) > 0:
                     for tactic in rule['tactics']:
@@ -106,7 +124,7 @@ class SentinelRule():
                     'requiredDataConnectors': rule_required_connectors,
                     'queryFrequency': f'{rule_query_frequency}',
                     'queryPeriod': f'{rule_query_period}',
-                    'triggerOperator': f'{parse_trigger_operator(rule['triggerOperator'])}',
+                    'triggerOperator': f'{trigger_operator}',
                     'triggerThreshold': rule_trigger_threshold,
                     'tactics': rule_tactics,
                     'relevantTechniques': rule_techniques,
@@ -119,13 +137,15 @@ class SentinelRule():
                 self.parsed_rules.append(parsed_rule)
 
 
-    def parse_trigger_operator(self, operator);
+    def parse_trigger_operator(self, operator):
         if operator == "GreaterThan":
             rule_trigger_operator = "gt"
         elif operator == "LessThan":
             rule_trigger_operator == "lt"
         elif operator == "Equal":
             rule_trigger_operator == "eq"
+        else:
+            rule_trigger_operator == ""
 
         return rule_trigger_operator
 
