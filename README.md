@@ -11,7 +11,7 @@ Only additional library requirement is PyYAML
 
 ## Export analytics rules
 
-You can either manually export the rule ARM templates from the web interface, or use az cli to export the rules to JSON format.
+You can either manually export the rule ARM templates from the web interface, or use Azure CLI to export the rules to JSON format.
 
 When exporting with Azure CLI, use the following query to pull only your scheduled rules:
 
