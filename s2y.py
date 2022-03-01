@@ -142,11 +142,11 @@ class SentinelRule():
         if operator == "GreaterThan":
             rule_trigger_operator = "gt"
         elif operator == "LessThan":
-            rule_trigger_operator == "lt"
+            rule_trigger_operator = "lt"
         elif operator == "Equal":
-            rule_trigger_operator == "eq"
+            rule_trigger_operator = "eq"
         else:
-            rule_trigger_operator == ""
+            rule_trigger_operator = ""
 
         return rule_trigger_operator
 
