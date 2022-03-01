@@ -28,6 +28,10 @@ Clone the repository: `git clone https://github.com/h0ffayyy/sentinel-to-yaml.gi
 
 Install the required libraries: `pip install -r requirements.txt`
 
+Run the script: `python s2y.py`
+
+You'll find the converted rules in the `output` directory
+
 ## Script help output
 
 ```
